@@ -1,40 +1,39 @@
 import '../Channel.css';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 function Channel(props) {
-    const audioElement = useRef(null)
+    const audioElement = useRef(null) 
+    const [isMute, setIsMute] = useState(false)
     useEffect(()=>{
         if(props.isPlaying){
             audioElement.current.currentTime  = props.audioCurrentTime
             audioElement.current.play();
-            // console.log("the offset is");
-            // console.log(audioElement.current.getBoundingClientRect());
         }else{
             audioElement.current.pause()
             audioElement.current.currentTime  = 0
 
         }
     },[props.isPlaying])
-    const muteHandler = () => {
-        if(audioElement.current.muted){
-            audioElement.current.muted = false
-        }else{
-            audioElement.current.muted = true
+    useEffect(()=>{
+        // console.log(props.muteObj);
+        console.log(props.muteObj[props.src]);
+        if(props.muteObj[props.src] !== isMute){
+            setIsMute(props.muteObj[props.src])
         }
-    }
+    },[props.muteObj])
+
     return (
-        <div className='channel-container'>
+        <div className='channel-container' style={{backgroundColor: props.color}}>
             <audio
                 loop={props.loop}
                 src={`/audio/${props.src}`}
                 ref={audioElement}
+                onEnded={(e) => {props.endHandler(e)}}
+                muted={isMute}
             >
             </audio>
-            <div className='channel-detail'>
-                <img className='channel-detail-button-img' src="/image/mute.png" onClick={muteHandler}/>
-            </div>
-            <div className='channel-track' style={{backgroundColor: props.color}}>
-                <span>{props.src}</span>
+            <div className='channel-track-name'>
+                <span style={{backgroundColor: props.color}}>{props.src}</span>
             </div>
 
         </div>

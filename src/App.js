@@ -3,7 +3,7 @@ import './App.css';
 import Channel from './components/Channel';
 import { useState, useRef, useEffect } from 'react';
 import { Slider } from '@mui/material';
-import { minHeight } from '@mui/system';
+// import { minHeight } from '@mui/system';
 
 function App() {
   const [isLoopActive, setIsLoopActive] = useState(false)
@@ -12,7 +12,6 @@ function App() {
   const [marksList, setMarksList] = useState([])
   const [audioCurrentTime, setAudioCurrentTime] = useState(0)
   const [audioDuration, setAudioDuration] = useState(0)
-  const [thumbExtension, setThumbExtension] = useState(0)
   const masterAudioElement = useRef(null)
   const sliderContainerRef = useRef(null)
   const thumbExtensionRef = useRef(null)
@@ -20,54 +19,68 @@ function App() {
   const [channelSrcList, setChannelSrcList] = useState(["_tambourine_shake_higher.mp3", "ALL TRACK.mp3", "B VOC.mp3",
   "DRUMS.mp3", "HE HE VOC.mp3", "HIGH VOC.mp3", "JIBRISH.mp3", "LEAD 1.mp3", "UUHO VOC.mp3" ]);
   const [colorList, setColorList] = useState(["blue", "cyan", "green","yellow", "orange", "red", "lightcoral", "purple", "pink" ]);
-
-  // useEffect(()=>{
-  //   thumbExtensionXChange(audioCurrentTime)
-  // },[audioCurrentTime])
+  const [muteObj, setMuteObj] = useState({})
+  const [muteList, setMuteList] = useState([])
+  
+  
   useEffect(() => {
+    // for each channel create a mute object
+    let tempMuteList = {};
+    channelSrcList.forEach((channelSrc)=>{
+      tempMuteList[channelSrc] = false
+    })
+    setMuteObj(tempMuteList)
+    let tempMuteList2 = [];
+    channelSrcList.forEach((channelSrc, index)=>{
+      tempMuteList2.push(false)
+    })
+    setMuteList(tempMuteList2)
+
+    // handles the thumb extension(cursor on all channels) place and height
     function handleResize() {
       let {height, y} = channelDivRef.current.getBoundingClientRect()
       thumbExtensionRef.current.style.height = (height + 35) + 'px';
-      thumbExtensionRef.current.style.top = (y - 37) + 'px';
+      thumbExtensionRef.current.style.top = (y) + 'px';
     }
     handleResize()
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
   const playHandler = () => {
     setIsPlaying(true)
     masterAudioElement.current.play()
   }
-  const pauseHandler = () => {
+  const stopHandler = () => {
     setIsPlaying(false)
     masterAudioElement.current.pause()
     masterAudioElement.current.currentTime  = 0
     setAudioCurrentTime(0)
     setSliderValue(0);
   }
-  const thumbExtensionXChange = (audioCurrentTime) =>{
-    // console.log(audioCurrentTime);
-    let thumb = document.querySelector(`[data-index='${audioCurrentTime*2}']`)
-    if(thumb){
-      let x = thumb.getBoundingClientRect().x
-      thumbExtensionRef.current.style.left = x + 'px';
-    }
-  }
+  const muteHandler = (e) => {
+    setMuteObj({
+      ...muteObj,
+      [e.target.name]: !muteObj[e.target.name]
+    })
+    // if(audioElement.current.muted){
+    //     audioElement.current.muted = false
+    // }else{
+    //     audioElement.current.muted = true
+    // }
+}
   const timeUpdate = () => {
     let currentTime = masterAudioElement.current.currentTime
-    console.log(currentTime);
-    let floorCurrentTime =  Math.floor(currentTime*2)/2
-    thumbExtensionXChange(currentTime)
-    // thumbExtensionXChange(floorCurrentTime)
+    if(audioCurrentTime !== currentTime){
       setSliderValue(currentTime);
       setAudioCurrentTime(currentTime)
-      // console.log(Math.floor(currentTime*2)/2);
-      // console.log(currentTime);
-    
+    }
   }
 
   const dataLoaded = () =>{
-    const duration = Math.floor(masterAudioElement.current.duration)
+    // sets the slider attribute that relay on the audio length and placing the thump extension in his place
+    const duration = Math.round(masterAudioElement.current.duration*2)/2
+    console.log(duration);
     setAudioDuration(duration)
     let tempArr = []
     for(let i = 0; i <= (duration*2); i++){
@@ -78,23 +91,12 @@ function App() {
       }
     }
     setMarksList(tempArr)
-    let lastMark = document.querySelector(`[data-index='${duration*2}']`)
-    let firstMark = document.querySelector(`[data-index='${0}']`)
-    let railSpan = document.getElementsByClassName('MuiSlider-rail')[0]
-    console.log(firstMark.getBoundingClientRect().x);
-    console.log(railSpan.getBoundingClientRect());
-    console.log(lastMark);
-    if(lastMark && firstMark && railSpan){
-      let firstMarkX = firstMark.getBoundingClientRect().x
-      let lastMarkX = lastMark.getBoundingClientRect().x
-      console.log("hi");
-      console.log(lastMarkX-firstMarkX);
-      console.log(railSpan.getBoundingClientRect());
-      // audio*100/duration*2
-    }
+    let thumb = document.getElementsByClassName('MuiSlider-thumb')[0]
+    thumb.appendChild(thumbExtensionRef.current)
   }
 
   const sliderChangeHandler = (e) => {
+    // give the drag an drop ability to the user 
     let value = e.target.value
     if(sliderValue !== value){
       setSliderValue(value);
@@ -102,17 +104,37 @@ function App() {
       setAudioCurrentTime(value)
     }
   }
+  const endHandler = (e) => {
+    //get the audio ready to play again
+    let audioElement = e.target
+    setIsPlaying(false)
+    audioElement.currentTime = 0    
+  }
 
   return (
     <div className="App">
       <div className='loop-machine'>
         <div className='main-section'>
-          <span className='thumb-extension' ref={thumbExtensionRef}> </span>
-          <div className='main-slider-index'>
+          <div className='mute-duration-index'>
             <div className='duration-index'>
-              {Math.floor(audioCurrentTime)}
+              <span className='duration-index-text'>{Math.floor(audioCurrentTime)}</span>
             </div>
+            {channelSrcList.map((channelSrc, index)=>{
+              return(
+                <div className='channel-mute-div' style={{borderLeft:  `4px solid ${colorList[index]}`}}>
+                      <img 
+                        className='channel-mute-div-img' 
+                        name={channelSrc} 
+                        src={muteObj[channelSrc]? "/image/mute.png" : "/image/sound.png"}
+                        onClick={muteHandler}
+                      />
+                  </div>
+                )     
+              })}
+          </div>
+          <div className='slider-channel-container' ref={channelDivRef}>
             <div className='slider-container' ref={sliderContainerRef}>
+              <span className='thumb-extension' ref={thumbExtensionRef}></span>
               <Slider
                 aria-label="Custom marks"
                 defaultValue={0}
@@ -124,17 +146,21 @@ function App() {
                 onChange={sliderChangeHandler}
               />
             </div>
-          </div>
-          <div className='channel-div' ref={channelDivRef}>
             {channelSrcList.map((channelSrc, index)=>{
+              // console.log(channelSrc);
+              // {console.log(muteObj.channelSrc);}
                 return <Channel
                           loop={isLoopActive} 
                           isPlaying={isPlaying} 
                           src={channelSrc} 
                           audioCurrentTime={audioCurrentTime}
                           color={colorList[index]}
+                          muteObj={muteObj}
+                          endHandler={endHandler}
+                          // isMute={muteObj.channelSrc !== undefined? muteObj.channelSrc : false }
                         />           
             })}
+            {/* the master audio element mock the regular audio element for extracting data to use in the app*/}
             <audio
                 loop={isLoopActive}
                 src={`/audio/${channelSrcList[0]}`}
@@ -142,19 +168,46 @@ function App() {
                 muted
                 onLoadedData={dataLoaded}
                 onTimeUpdate={timeUpdate}
+                onEnded={endHandler}
+
             >
             </audio>
           </div>
         </div>
         <div className='footer'>
-            <button type='button' onClick={playHandler}>
-              <img className='footer-button-img' src='/image/play.png'/>Play
+            <button 
+              className={isPlaying?'footer-button button-active':'footer-button'}
+              type='button'
+              onClick={playHandler}
+            >
+               <img 
+                className={isPlaying?'footer-button-img button-active':'footer-button-img'}
+                src='/image/play.png'
+              />
+              <span 
+              className={isPlaying?'footer-button-text button-active':'footer-button-text'}
+              >
+                Play
+              </span>
             </button>
-            <button type='button' onClick={pauseHandler}>
-              <img className='footer-button-img' src='/image/pause.png'/>Pause
+            <button className='footer-button' type='button' onClick={stopHandler}>
+              <img className='footer-button-img' src='/image/stop.png'/>
+              <span className='footer-button-text'>Stop</span>
             </button>
-            <button type='button' onClick={()=>{setIsLoopActive(!isLoopActive)}}>
-              <img className='footer-button-img' src='/image/loop.png'/>Loop
+            <button 
+              className={isLoopActive?'footer-button button-active':'footer-button'} 
+              type='button'
+               onClick={()=>{setIsLoopActive(!isLoopActive)}}
+            >
+              <img 
+                className={isLoopActive?'footer-button-img button-active':'footer-button-img'}
+                src='/image/loop.png'
+              />
+              <span 
+              className={isLoopActive?'footer-button-text button-active':'footer-button-text'}
+              >
+                Loop
+              </span>            
             </button>
         </div>
       </div>
