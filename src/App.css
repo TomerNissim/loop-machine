@@ -1,38 +1,90 @@
+:root {
+  --lightGrey: #BAB7B7;
+}
 .App {
-  text-align: center;
+  background-color: var(--lightGrey) ;
+  height: max-content;
+  /* min-height: 100vh; */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.loop-machine{
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  justify-content: space-between;
+  min-height: 96vh;
+  height: min-content;
+  padding-top: 2vh;
+  margin-bottom: 2vh;
+  background-color: var(--lightGrey) ;
+
+}
+
+.main-section{
+  width:80vw;
+  margin: 0 auto;
+  border: 2px solid black;
+  padding-right: 2.2%;
+  /* min-height: 86vh; */
+  height: min-content;
+}
+.thumb-extension{
+  position: absolute;
+  width: 1px;
+  min-height:0vh;
+  left:1;
+  top: 0;
+  background-color: white;
+  z-index: 1;
+  transition-property: left;
+  transition-duration: 150ms;
+  /* margin-top: 16px; */
+}
+.main-slider-index{
+  display: flex;
+}
+.duration-index{
+  width: 4.8%;
+  font-size: 18px;
+  text-align: center;
+  padding: 1% 0;
+}
+.slider-container{
+  width:95%;
+  background-color: var(--lightGrey) ;
+  height: 50px;
+}
+.MuiSlider-root{
+  color: white !important;
+  background-color: var(--lightGrey) !important ;
+  padding-left: 1px !important;
+  height: 22px !important;
+}
+.MuiSlider-thumb{
   color: white;
+  margin-top: -10px
 }
-
-.App-link {
-  color: #61dafb;
+.MuiSlider-mark{
+  color: black !important;
+  background-color: black !important ;
+  height: 15px !important;
+  width: 2px !important;
+  margin-top: -10px;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.MuiSlider-track{
+  background-color: transparent !important;
+  border: none !important;
+}
+.MuiSlider-rail{
+  background-color: var(--lightGrey) !important ;
+}
+.footer{
+  align-self: center;
+  display: flex;
+  justify-content:space-evenly;
+  width: 40%;
+  margin-bottom: 2vh;
+}
+.footer-button-img{
+  height: 20px;
+  width: auto;
 }
