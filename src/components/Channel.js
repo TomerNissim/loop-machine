@@ -5,6 +5,7 @@ function Channel(props) {
     const audioElement = useRef(null) 
     const [isMute, setIsMute] = useState(false)
     useEffect(()=>{
+        // play and stop the audio playback after a change in state (after buttons play and stop press)
         if(props.isPlaying){
             audioElement.current.currentTime  = props.audioCurrentTime
             audioElement.current.play();
@@ -14,9 +15,9 @@ function Channel(props) {
 
         }
     },[props.isPlaying])
+
     useEffect(()=>{
-        // console.log(props.muteObj);
-        console.log(props.muteObj[props.src]);
+        //extracting the relevant mute status from the mute object
         if(props.muteObj[props.src] !== isMute){
             setIsMute(props.muteObj[props.src])
         }

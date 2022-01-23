@@ -1,70 +1,21 @@
-# Getting Started with Create React App
+# Loop Machine App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## General Description
 
-## Available Scripts
+The Loop Machine app allows playing multiple audio channels simultaneously, with the option to mute and un-mute each channel individually. The app requires that all samples have the same length and BPM. The application is based on the node.js framework, using HTML, JavaScript, and CSS.
+Libraries used: react for the user interface and MUI/Material for the slider bar.
 
-In the project directory, you can run:
+## Functional Description
 
-### `npm start`
+There are three main buttons at the bottom of the page: (i) play - plays all sample files, (ii) stop - stops all sample files and brings them back to the starting point them to the beginning, (iii) loop - when pressed, the samples are played in repeat. Moreover, there is a mute button per channel located on the left side of the board and a cursor on the top of the board that presents the current time of the samples. The user can manually adjust the current time of the samples by dragging the cursor along the bar.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Implementation Notes
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The number of channels to be displayed is hardcoded but controlled from a single variable that holds the names of the audio files (channels) to be played. You can add or remove channels by adding or removing audio files, and the graphical user interface adjusts automatically. I chose eight different colors for the audio channels. If you add more than eight audio files, the colors for the additional channels will be repeated. 
 
-### `npm test`
+I used MUI/Material slider bar to display the playback time ticks and current playback time and allow users to drag and drop playback location. The slider bar length depends on the audio size. I added a cursor (thumb extension), synchronizing between them by appending the cursor to the slider bar thumb.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+To received audio playback data (duration, current playback time) i added a mockup channel(named - masterAudioElement). This channel helps to manage the slide bar. 
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Project Deployment 
+url: https://loop-machine0268.herokuapp.com

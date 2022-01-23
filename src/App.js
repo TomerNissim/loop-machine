@@ -1,9 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
 import Channel from './components/Channel';
 import { useState, useRef, useEffect } from 'react';
 import { Slider } from '@mui/material';
-// import { minHeight } from '@mui/system';
 
 function App() {
   const [isLoopActive, setIsLoopActive] = useState(false)
@@ -16,12 +14,11 @@ function App() {
   const sliderContainerRef = useRef(null)
   const thumbExtensionRef = useRef(null)
   const channelDivRef = useRef(null)
-  const [channelSrcList, setChannelSrcList] = useState(["_tambourine_shake_higher.mp3", "ALL TRACK.mp3", "B VOC.mp3",
+  // the channel source list controls the number of channels in the application
+  const [channelSrcList, setChannelSrcList] = useState(["_tambourine_shake_higher.mp3", "B VOC.mp3",
   "DRUMS.mp3", "HE HE VOC.mp3", "HIGH VOC.mp3", "JIBRISH.mp3", "LEAD 1.mp3", "UUHO VOC.mp3" ]);
   const [colorList, setColorList] = useState(["blue", "cyan", "green","yellow", "orange", "red", "lightcoral", "purple", "pink" ]);
-  const [muteObj, setMuteObj] = useState({})
-  const [muteList, setMuteList] = useState([])
-  
+  const [muteObj, setMuteObj] = useState({})  
   
   useEffect(() => {
     // for each channel create a mute object
@@ -30,11 +27,6 @@ function App() {
       tempMuteList[channelSrc] = false
     })
     setMuteObj(tempMuteList)
-    let tempMuteList2 = [];
-    channelSrcList.forEach((channelSrc, index)=>{
-      tempMuteList2.push(false)
-    })
-    setMuteList(tempMuteList2)
 
     // handles the thumb extension(cursor on all channels) place and height
     function handleResize() {
@@ -52,6 +44,7 @@ function App() {
     masterAudioElement.current.play()
   }
   const stopHandler = () => {
+    //stop the audio and get it ready to play again from the beginning
     setIsPlaying(false)
     masterAudioElement.current.pause()
     masterAudioElement.current.currentTime  = 0
@@ -63,13 +56,9 @@ function App() {
       ...muteObj,
       [e.target.name]: !muteObj[e.target.name]
     })
-    // if(audioElement.current.muted){
-    //     audioElement.current.muted = false
-    // }else{
-    //     audioElement.current.muted = true
-    // }
 }
-  const timeUpdate = () => {
+  const timeUpdateHandler = () => {
+    // this function is responsible of setting the slider to the correct playback location
     let currentTime = masterAudioElement.current.currentTime
     if(audioCurrentTime !== currentTime){
       setSliderValue(currentTime);
@@ -78,11 +67,11 @@ function App() {
   }
 
   const dataLoaded = () =>{
-    // sets the slider attribute that relay on the audio length and placing the thump extension in his place
+    // sets the slider attribute according to the audio length and placing the thumb extension in its place
     const duration = Math.round(masterAudioElement.current.duration*2)/2
-    console.log(duration);
     setAudioDuration(duration)
     let tempArr = []
+    // this loop creates the marks in the slider
     for(let i = 0; i <= (duration*2); i++){
       if((i % 2) === 0){
         tempArr.push({label: `${i/2}`, value: (i/2)})
@@ -96,7 +85,8 @@ function App() {
   }
 
   const sliderChangeHandler = (e) => {
-    // give the drag an drop ability to the user 
+    // the function is activate by the user dragging the slider 
+    // it update the slider value and the audio current time to the selected time
     let value = e.target.value
     if(sliderValue !== value){
       setSliderValue(value);
@@ -121,7 +111,7 @@ function App() {
             </div>
             {channelSrcList.map((channelSrc, index)=>{
               return(
-                <div className='channel-mute-div' style={{borderLeft:  `4px solid ${colorList[index]}`}}>
+                <div className='channel-mute-div' style={{borderLeft:  `4px solid ${colorList[(index%colorList.length)]}`}}>
                       <img 
                         className='channel-mute-div-img' 
                         name={channelSrc} 
@@ -147,29 +137,27 @@ function App() {
               />
             </div>
             {channelSrcList.map((channelSrc, index)=>{
-              // console.log(channelSrc);
-              // {console.log(muteObj.channelSrc);}
                 return <Channel
                           loop={isLoopActive} 
                           isPlaying={isPlaying} 
                           src={channelSrc} 
                           audioCurrentTime={audioCurrentTime}
-                          color={colorList[index]}
+                          color={colorList[(index%colorList.length)]}
                           muteObj={muteObj}
                           endHandler={endHandler}
-                          // isMute={muteObj.channelSrc !== undefined? muteObj.channelSrc : false }
                         />           
             })}
-            {/* the master audio element mock the regular audio element for extracting data to use in the app*/}
+            {/* the master audio element mock the regular audio element for 
+              managing the audio play in a single and general location 
+              that doesn't effect all channels*/}
             <audio
                 loop={isLoopActive}
                 src={`/audio/${channelSrcList[0]}`}
                 ref={masterAudioElement}
                 muted
                 onLoadedData={dataLoaded}
-                onTimeUpdate={timeUpdate}
+                onTimeUpdate={timeUpdateHandler}
                 onEnded={endHandler}
-
             >
             </audio>
           </div>
